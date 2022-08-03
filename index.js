@@ -60,6 +60,28 @@ app.post("/contacts", (req, res) => {
   res.json({ contact: newContact });
 });
 
+//route for GET/ contacts/:id
+// the sort of route needed for requests where I need to identify a specifc item to make changes or GET
+app.get("/contacts/:id", (req, res) => {
+  // console.log();
+
+  const contactId = Number(req.params.id);
+
+  const contact = contacts.find((contact) => {
+    return contact.id === contactId;
+  });
+
+  if (contact) {
+    res.json({ contact: contact });
+  } else {
+    res.status(404).json("");
+  }
+
+  //contacts.find goes through each contact and finds a match for the id, if it matches then it will return the individual contacts info which is seen in the if statement, if not will return an status 404.
+
+  // could have also done a for each loop
+});
+
 // this goes last
 // start up our server
 const port = 3030;
