@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 //importing contacts.js
 const contacts = require("./contacts.js");
+const meetings = require("./meetings.js");
 
 // Create a new express application
 const app = express();
@@ -23,15 +24,21 @@ app.use(express.json());
 app.get("/", (request, response) => {
   // console.log("got a GET quest to /");
 
-  response.json({
-    message: "great work!",
-  });
+  response.json({});
 });
 
 // route created for GET /contacts
 app.get("/contacts", (req, res) => {
+  // const Id = contacts.length + 1;
+
+  // const contactMeetings = meetings.filter(
+  //   (meeting) => meeting.contactId === Id
+  // );
+  // console.log("here are the meetings", contactMeetings);
+
   res.json({
     contacts: contacts,
+    // meetings: contactMeetings,
   });
 });
 
@@ -42,6 +49,9 @@ app.post("/contacts", (req, res) => {
 
   //creating the id
   const nextID = contacts.length + 1;
+  // const contactMeetings = meetings.filter(
+  //   (meeting) => meeting.contactId === nextID
+  // );
 
   const newContact = {
     id: nextID,
@@ -53,11 +63,12 @@ app.post("/contacts", (req, res) => {
     email: req.body.email,
     linkedin: req.body.linkedin,
     twitter: req.body.twitter,
+    // meetings: contactMeetings,
   };
 
   contacts.push(newContact);
 
-  res.json({ contact: newContact });
+  res.status(201).json({ contact: newContact });
 });
 
 //route for GET/ contacts/:id
@@ -80,6 +91,29 @@ app.get("/contacts/:id", (req, res) => {
   //contacts.find goes through each contact and finds a match for the id, if it matches then it will return the individual contacts info which is seen in the if statement, if not will return an status 404.
 
   // could have also done a for each loop
+});
+
+// route for DELETE a contact by ID
+app.delete("/contacts/:id", (req, res) => {
+  // console.log("testing");
+
+  //find the contact with the params id and id from contacts.id
+  const matchContact = contacts.find(
+    (contact) => contact.id === Number(req.params.id)
+  );
+
+  //to do splice, we need the index from the array of contacts.js that was found in matchContact. Set it in a variable
+  const indexOfArray = contacts.indexOf(matchContact);
+
+  // use splice to update it
+  contacts.splice(indexOfArray, 1);
+
+  // set the status return with the contact
+  res.status(200).json({
+    contact: {
+      ...matchContact,
+    },
+  });
 });
 
 // this goes last
