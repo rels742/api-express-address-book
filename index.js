@@ -29,16 +29,15 @@ app.get("/", (request, response) => {
 
 // route created for GET /contacts
 app.get("/contacts", (req, res) => {
-  // const Id = contacts.length + 1;
-
-  // const contactMeetings = meetings.filter(
-  //   (meeting) => meeting.contactId === Id
-  // );
-  // console.log("here are the meetings", contactMeetings);
+  const allContacts = contacts.map((contact) => {
+    return {
+      ...contact,
+      meetings: meetings.filter((meeting) => meeting.contactId === contact.id),
+    };
+  });
 
   res.json({
-    contacts: contacts,
-    // meetings: contactMeetings,
+    contacts: allContacts,
   });
 });
 
@@ -49,9 +48,9 @@ app.post("/contacts", (req, res) => {
 
   //creating the id
   const nextID = contacts.length + 1;
-  // const contactMeetings = meetings.filter(
-  //   (meeting) => meeting.contactId === nextID
-  // );
+  const contactMeetings = meetings.filter(
+    (meeting) => meeting.contactId === nextID
+  );
 
   const newContact = {
     id: nextID,
@@ -63,7 +62,7 @@ app.post("/contacts", (req, res) => {
     email: req.body.email,
     linkedin: req.body.linkedin,
     twitter: req.body.twitter,
-    // meetings: contactMeetings,
+    meetings: contactMeetings,
   };
 
   contacts.push(newContact);
@@ -82,8 +81,12 @@ app.get("/contacts/:id", (req, res) => {
     return contact.id === contactId;
   });
 
+  const contactMeetings = meetings.filter(
+    (meeting) => meeting.contactId === contactId
+  );
+
   if (contact) {
-    res.json({ contact: contact });
+    res.json({ contact: contact, meetings: contactMeetings });
   } else {
     res.status(404).json("");
   }
@@ -120,14 +123,14 @@ app.put("/contacts/:id", (req, res) => {
   //need a body in insomnia for PUT
   // find the old contact and match with the params
 
-  const oldContact = contacts.find(
+  const contactBefore = contacts.find(
     (contact) => contact.id === Number(req.params.id)
   );
 
-  const indexOfArray = contacts.indexOf(oldContact);
+  const indexOfArray = contacts.indexOf(contactBefore);
 
   //update it with splice, replacing the content with the req.body
-  contacts.splice(indexOfArray, 1, { ...req.body, id: oldContact.id });
+  contacts.splice(indexOfArray, 1, { ...req.body, id: contactBefore.id });
 
   //set the updated contact
   const update = contacts.find(
