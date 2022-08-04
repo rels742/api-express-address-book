@@ -95,8 +95,6 @@ app.get("/contacts/:id", (req, res) => {
 
 // route for DELETE a contact by ID
 app.delete("/contacts/:id", (req, res) => {
-  // console.log("testing");
-
   //find the contact with the params id and id from contacts.id
   const matchContact = contacts.find(
     (contact) => contact.id === Number(req.params.id)
@@ -112,6 +110,34 @@ app.delete("/contacts/:id", (req, res) => {
   res.status(200).json({
     contact: {
       ...matchContact,
+    },
+  });
+});
+
+// PUT route
+//Update a contact by ID
+app.put("/contacts/:id", (req, res) => {
+  //need a body in insomnia for PUT
+  // find the old contact and match with the params
+
+  const oldContact = contacts.find(
+    (contact) => contact.id === Number(req.params.id)
+  );
+
+  const indexOfArray = contacts.indexOf(oldContact);
+
+  //update it with splice, replacing the content with the req.body
+  contacts.splice(indexOfArray, 1, { ...req.body, id: oldContact.id });
+
+  //set the updated contact
+  const update = contacts.find(
+    (contact) => contact.id === Number(req.params.id)
+  );
+
+  //set the response with status code
+  res.status(201).json({
+    contact: {
+      ...update,
     },
   });
 });
